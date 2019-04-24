@@ -156,7 +156,7 @@ class Cache:
 
 			if ( self.wordsPerBlock != 1 ): 	#This is easier than trying to think through the issue mentioned below 
 
-				for i in range( ceil( log( self.wordsPerBlock, 2 ) ) ):	#There might be a bug here with this loop if wordsPerBlock is 1 or 0; 0 should be a rejected number though
+				for i in range( ceil( log( self.wordsPerBlock, 2 ) ), i ):	#There might be a bug here with this loop if wordsPerBlock is 1 or 0; 0 should be a rejected number though
 
 					zeroString = zeroString + "0"  	#Does it execute at all if wordsPerBlock is 1? Hopefully it doesn't...
 
@@ -233,10 +233,12 @@ def simulate( instructions, instructionsHex, debugMode, program):
 			pipelineCycles += 1
 
 		elif ( fetch[0:6] == "001000" ):	#addi
-
+			Rt = int(fetch[11:16],2)
 			imm = process2Comp(fetch[16:32])
-            Rs = int(fetch[6:11],2)
-            Rt = int(fetch[11:16],2)
+			#Rs = int(fetch[6:11],2)
+            #Rt = int(fetch[11:16],2)
+			Rs = int(fetch[6:11],2)
+
 			if ( debugMode ):
 
 				print("Cycle " + str(Cycle) + " for multi-cycle:")
@@ -247,7 +249,7 @@ def simulate( instructions, instructionsHex, debugMode, program):
 
 			outFile.write("Cycle " + str(Cycle) + " for multi-cycle:\n")
 
-			outFile.write("PC =" + str(PC*4) + " Instruction: 0x" +  instructionsHex[PC] + " :" + "addi $" + str(Rt) + ",$" + str(Rs)) + ", " + str(imm) + "\n" )
+			outFile.write("PC =" + str(PC*4) + " Instruction: 0x" +  instructionsHex[PC] + " :" + "addi $" + str(Rt) + ",$" + str(Rs) + ", " + str(imm) + "\n" )
 
 			outFile.write("Takes 4 cycles for multi-cycle\n\n")
 
@@ -265,10 +267,11 @@ def simulate( instructions, instructionsHex, debugMode, program):
         
 
 		elif ( fetch[0:6] == "001101" ):	#ori
-
+			Rs = int(fetch[6:11],2)
 			imm = int(fetch[16:32],2)
-            Rs = int(fetch[6:11],2)
-            Rt = int(fetch[11:16],2)
+			Rt = int(fetch[11:16],2)
+            #Rs = int(fetch[6:11],2)
+            #Rt = int(fetch[11:16],2)
 
 			if ( debugMode ):
 
@@ -297,10 +300,11 @@ def simulate( instructions, instructionsHex, debugMode, program):
 			registers[Rt] = registers[Rs] | imm
 
 		elif ( fetch[0:6] == "000000" and fetch[21:32] == "00000100010"):	#sub
-
-			Rs = int(fetch[6:11],2)
-			Rt = int fetch[11:16],2)
+			Rt = int(fetch[11:16],2)
 			Rd = int(fetch[16:21],2)
+			Rs = int(fetch[6:11],2)
+			#Rt = int fetch[11:16],2)
+			#Rd = int(fetch[16:21],2)
 
 			if ( debugMode ):
 
@@ -328,8 +332,9 @@ def simulate( instructions, instructionsHex, debugMode, program):
 
 			registers[Rd] = registers[Rs] - registers[Rt]
 
-        elif(fetch[0:6] == "000000" and fetch[21:32] == "00000100001"):	#addu
-            imm = process2Comp(fetch[16:32])
+        
+		elif(fetch[0:6] == "000000") and (fetch[21:32] == "00000100001"):	#addu
+			imm = process2Comp(fetch[16:32])
 			Rs = int(fetch[6:11],2)
 			Rt = int(fetch[11:16],2)
 			Rd = int(fetch[16:21],2)
@@ -338,13 +343,13 @@ def simulate( instructions, instructionsHex, debugMode, program):
 
 				print("Cycle " + str(Cycle) + " for multi-cycle:")
 
-				print("PC =" + str(PC*4) + " Instruction: 0x" +  instructionsHex[PC] + " :" + "addu $" + str(int(fetch[16:21],2)) + ",$" + str(int(fetch[6:11],2)) + ",$" + str(int(fetch[11:16],2)) )
+				print("PC =" + str(PC*4) + " Instruction: 0x" +  instructionsHex[PC] + " :" + "addu $" + str(Rd) + ",$" + str(Rs) + ",$" + str(Rt) )
 
 				print("Takes 4 cycles for multi-cycle\n")
 
 			outFile.write("Cycle " + str(Cycle) + " for multi-cycle:\n")
 
-			outFile.write("PC =" + str(PC*4) + " Instruction: 0x" +  instructionsHex[PC] + " :" + "addu $" + str(int(fetch[16:21],2)) + ",$" + str(int(fetch[6:11],2)) + ",$" + str(int(fetch[11:16],2)) + "\n" )
+			outFile.write("PC =" + str(PC*4) + " Instruction: 0x" +  instructionsHex[PC] + " :" + "addu $" + str(Rd) + ",$" + str(Rs) + ",$" + str(Rt) + "\n" )
 
 			outFile.write("Takes 4 cycles for multi-cycle\n\n")
 
@@ -357,21 +362,17 @@ def simulate( instructions, instructionsHex, debugMode, program):
 			pipelineCycles += 1
 
 			DIC += 1
-
-			register[Rd] = register[Rs] + register[Rt]
-            
-
-        elif ( fetch[0:6] == "000000" and fetch[21:32] == "00000101010"):	#slt
+			registers[Rd] = registers[Rs] + registers[Rt]
+		
+		elif ( fetch[0:6] == "000000" and fetch[21:32] == "00000101010"):	#slt
 
 			Rd = int(fetch[16:21],2)
-            Rs = int(fetch[6:11],2)
-            Rt = int(fetch[11:16],2)
+			Rs = int(fetch[6:11],2)
+			Rt = int(fetch[11:16],2)
 
 			if ( debugMode ):
-
 				print("Cycle " + str(Cycle) + " for multi-cycle:")
-
-				print("PC =" + str(PC*4) + " Instruction: 0x" +  instructionsHex[PC] + " :" + "slt $" + str(Rd)) + ",$" + str(Rs) + ",$" + str(Rt) )
+				print("PC =" + str(PC*4) + " Instruction: 0x" +  instructionsHex[PC] + " :" + "slt $" + str(Rd) + ",$" + str(Rs) + ",$" + str(Rt) )
 
 				print("Takes 4 cycles for multi-cycle\n")
 
@@ -390,24 +391,23 @@ def simulate( instructions, instructionsHex, debugMode, program):
 			pipelineCycles += 1
 
 			DIC += 1
-
 			
-            if(register[Rs] < register[Rt]):
-                register[Rd] = 1
-            elif(register[Rs] > register[Rt]):
-                register[Rd] = 0
-
-        elif ( fetch[0:6] == "000000" and fetch[21:32] == "00000101011"):	#sltu
+			if(registers[Rs] < registers[Rt]):
+				registers[Rd] = 1
+			elif(registers[Rs] > registers[Rt]):
+				registers[Rd] = 0
+		
+		elif ( fetch[0:6] == "000000" and fetch[21:32] == "00000101011"):	#sltu
 
 			Rd = int(fetch[16:21],2)
-            Rs = int(fetch[6:11],2)
-            Rt = int(fetch[11:16],2)
+			Rs = int(fetch[6:11],2)
+			Rt = int(fetch[11:16],2)
 
 			if ( debugMode ):
 
 				print("Cycle " + str(Cycle) + " for multi-cycle:")
 
-				print("PC =" + str(PC*4) + " Instruction: 0x" +  instructionsHex[PC] + " :" + "sltu $" + str(Rd)) + ",$" + str(Rs) + ",$" + str(Rt) )
+				print("PC =" + str(PC*4) + " Instruction: 0x" +  instructionsHex[PC] + " :" + "sltu $" + str(Rd) + ",$" + str(Rs) + ",$" + str(Rt) )
 
 				print("Takes 4 cycles for multi-cycle\n")
 
@@ -426,25 +426,24 @@ def simulate( instructions, instructionsHex, debugMode, program):
 			pipelineCycles += 1
 
 			DIC += 1
-
 			
-            if(register[Rs] < register[Rt]):
-                register[Rd] = 1
-            elif(register[Rs] > register[Rt]):
-                register[Rd] = 0
-
-        elif ( fetch[0:6] == "000000" and fetch[26:32] == "000000"):	#sll
+			if(registers[Rs] < registers[Rt]):
+				registers[Rd] = 1
+			elif(registers[Rs] > registers[Rt]):
+				registers[Rd] = 0
+		
+		elif ( fetch[0:6] == "000000" and fetch[26:32] == "000000"):	#sll
 
 			Rh = int(fetch[21:26],2)
-            Rd = int(fetch[16:21],2)
-            Rs = int(fetch[6:11],2)
-            Rt = int(fetch[11:16],2)
+			Rd = int(fetch[16:21],2)
+			Rs = int(fetch[6:11],2)
+			Rt = int(fetch[11:16],2)
 
 			if ( debugMode ):
 
 				print("Cycle " + str(Cycle) + " for multi-cycle:")
 
-				print("PC =" + str(PC*4) + " Instruction: 0x" +  instructionsHex[PC] + " :" + "sll $" + str(Rd)) + ",$" + str(Rs) + ",$" + str(Rt) )
+				print("PC =" + str(PC*4) + " Instruction: 0x" +  instructionsHex[PC] + " :" + "sll $" + str(Rd) + ",$" + str(Rs) + ",$" + str(Rt) )
 
 				print("Takes 4 cycles for multi-cycle\n")
 
@@ -464,14 +463,14 @@ def simulate( instructions, instructionsHex, debugMode, program):
 
 			DIC += 1
 
-			register[Rd] = register[Rt] << register[Rh]
+			registers[Rd] = registers[Rt] << registers[Rh]
             
 
 		elif ( fetch[0:6] == "000100" ):	#beq
 
 			imm = process2Comp(fetch[16:32])
-            Rs = int(fetch[6:11],2)
-            Rt = int(fetch[11:16],2)
+			Rs = int(fetch[6:11],2)
+			Rt = int(fetch[11:16],2)
 
 			if ( debugMode ):
 
@@ -499,13 +498,12 @@ def simulate( instructions, instructionsHex, debugMode, program):
 
 			if (registers[Rs] == registers[Rt]):
 				PC = PC + imm
-            
 
-        elif ( fetch[0:6] == "000101" ):	#bne
+		elif ( fetch[0:6] == "000101" ):	#bne
 
 			imm = process2Comp(fetch[16:32])
-            Rs = int(fetch[6:11],2)
-            Rt = int(fetch[11:16],2)
+			Rs = int(fetch[6:11],2)
+			Rt = int(fetch[11:16],2)
 
 			if ( debugMode ):
 
@@ -531,14 +529,14 @@ def simulate( instructions, instructionsHex, debugMode, program):
 
 			DIC += 1
 
-			if (register[Rs] != register[Rt]):
-                PC = PC + imm
+			if (registers[Rs] != registers[Rt]):
+				PC = PC + imm
 
 		elif ( fetch[0:6] == "100011" ):	#lw
 
 			imm = process2Comp(fetch[16:32])
-            Rs = int(fetch[6:11],2)
-            Rt = int(fetch[11:16],2)
+			Rs = int(fetch[6:11],2)
+			Rt = int(fetch[11:16],2)
 
 			if( debugMode ):
 
@@ -568,11 +566,11 @@ def simulate( instructions, instructionsHex, debugMode, program):
 
 			DIC += 1
 
-        elif ( fetch[0:6] == "101011" ):	#sw
+		elif ( fetch[0:6] == "101011" ):	#sw
 
 			imm = process2Comp(fetch[16:32])
-            Rs = int(fetch[6:11],2)
-            Rt = int(fetch[11:16],2)
+			Rs = int(fetch[6:11],2)
+			Rt = int(fetch[11:16],2)
 
 			if( debugMode ):
 
@@ -611,9 +609,9 @@ def simulate( instructions, instructionsHex, debugMode, program):
 	print( "Simulation complete. Now printing register information:" )
 
 	counter = 0
-    threeCyclePercent = (threeCycles/Cycle) * 100
-    fourCyclePercent = (fourCycles/Cycle) * 100
-    fiveCyclePercent = (fiveCycles/Cycle) * 100
+	threeCyclePercent = (threeCycles/Cycle) * 100
+	fourCyclePercent = (fourCycles/Cycle) * 100
+	fiveCyclePercent = (fiveCycles/Cycle) * 100
 	for register in registers:
 
 		print( "Register " + str( counter ) + ": " + str( register ) )
