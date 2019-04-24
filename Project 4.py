@@ -498,9 +498,8 @@ def simulate( instructions, instructionsHex, debugMode, program):
 			DIC += 1
 
 			if (registers[Rs] == registers[Rt]):
-				PC = PC + 4 + (4 * imm)
-            else:
-                PC = PC + 4
+				PC = PC + imm
+            
 
         elif ( fetch[0:6] == "000101" ):	#bne
 
@@ -533,9 +532,7 @@ def simulate( instructions, instructionsHex, debugMode, program):
 			DIC += 1
 
 			if (register[Rs] != register[Rt]):
-                PC = PC + 4 + (4*imm)
-            else:
-                PC = PC + 4
+                PC = PC + imm
 
 		elif ( fetch[0:6] == "100011" ):	#lw
 
@@ -614,7 +611,9 @@ def simulate( instructions, instructionsHex, debugMode, program):
 	print( "Simulation complete. Now printing register information:" )
 
 	counter = 0
-
+    threeCyclePercent = (threeCycles/Cycle) * 100
+    fourCyclePercent = (fourCycles/Cycle) * 100
+    fiveCyclePercent = (fiveCycles/Cycle) * 100
 	for register in registers:
 
 		print( "Register " + str( counter ) + ": " + str( register ) )
@@ -631,11 +630,11 @@ def simulate( instructions, instructionsHex, debugMode, program):
 
 	print("Total # of cycles for multi-cycle: " + str(Cycle) + "\n")
 
-	print("                    " + str(threeCycles) + " instructions take 3 cycles\n" )
+	print("                    " + str(threeCycles) + " instructions take 3 cycles\n" + "           " + str(threeCyclePercent) + " Percent of 3 cycles in the program\n")
 
-	print("                    " + str(fourCycles) + " instructions take 4 cycles\n" )
+	print("                    " + str(fourCycles) + " instructions take 4 cycles\n" + "           " + str(fourCyclePercent) + " Percent of 4 cycles in the program\n")
 
-	print("                    " + str(fiveCycles) + " instructions take 5 cycles\n\n" )
+	print("                    " + str(fiveCycles) + " instructions take 5 cycles\n" + "           " + str(fiveCyclePercent) + " Percent of 5 cycles in the program\n\n" )
 
 	print( "Total cycles for pipelined CPU: "+ str( pipelineCycles ) + "\n\n" )
 
