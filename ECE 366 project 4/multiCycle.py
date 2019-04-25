@@ -42,24 +42,46 @@ class Statistic:
             print("Instruction: " + self.I)
             if(self.name == "add"):
                 print("Cycle: " + str(self.cycle-4) + "|PC: " +str(self.pc*4) + " add $" + str(int(self.I[16:21],2)) + ",$" +str(int(self.I[6:11],2)) + ",$" + str(int(self.I[11:16],2)) + "   Taking 4 cycles")
+            elif(self.name == "addu"):
+                print("Cycle: " + str(self.cycle-4) + "|PC: " +str(self.pc*4) + " addu $" + str(int(self.I[16:21],2)) + ",$" +str(int(self.I[6:11],2)) + ",$" + str(int(self.I[11:16],2)) + "   Taking 4 cycles")
+            elif(self.name == "sub"):
+                print("Cycle: " + str(self.cycle-4) + "|PC: " +str(self.pc*4) + " sub $" + str(int(self.I[16:21],2)) + ",$" +str(int(self.I[6:11],2)) + ",$" + str(int(self.I[11:16],2)) + "   Taking 4 cycles")
             elif(self.name == "addi"):
                 print("Cycle: " + str(self.cycle-4) + "|PC: " +str(self.pc*4) + " addi $" + str(int(self.I[16:21],2)) + ",$" +str(int(self.I[6:11],2)) + ","  + str(imm)  + "   Taking 4 cycles")
             elif(self.name == "beq"):
                 print("Cycle: " + str(self.cycle-3) + "|PC: " +str(self.pc*4) + " beq $" + str(int(self.I[6:11],2)) + ",$" +str(int(self.I[11:16],2)) + ","  + str(imm)  + "   Taking 3 cycles")
+            elif(self.name == "bne"):
+                print("Cycle: " + str(self.cycle-3) + "|PC: " +str(self.pc*4) + " bne $" + str(int(self.I[6:11],2)) + ",$" +str(int(self.I[11:16],2)) + ","  + str(imm)  + "   Taking 3 cycles")
+            elif(self.name == "ori"):
+                print("Cycle: " + str(self.cycle-3) + "|PC: " +str(self.pc*4) + " ori $" + str(int(self.I[6:11],2)) + ",$" +str(int(self.I[11:16],2)) + ","  + str(imm)  + "   Taking 4 cycles")
             elif(self.name == "slt"):
                 print("Cycle: " + str(self.cycle-4) + "|PC: " +str(self.pc*4) + " slt $" + str(int(self.I[16:21],2)) + ",$" +str(int(self.I[6:11],2)) + ",$" + str(int(self.I[11:16],2)) + "   Taking 4 cycles")
+            elif(self.name == "sltu"):
+                print("Cycle: " + str(self.cycle-4) + "|PC: " +str(self.pc*4) + " sltu $" + str(int(self.I[16:21],2)) + ",$" +str(int(self.I[6:11],2)) + ",$" + str(int(self.I[11:16],2)) + "   Taking 4 cycles")
             elif(self.name == "sw"):
                 print("Cycle: " + str(self.cycle-4) + "|PC :" +str(self.pc*4) + " sw $" + str(int(self.I[6:11],2)) + "," + str(int(self.I[16:32],2) - 8192) + "($" + str(int(self.I[6:11],2)) + ")" + "   Taking 4 cycles"  )
+            elif(self.name == "lw"):
+                print("Cycle: " + str(self.cycle-5) + "|PC :" +str(self.pc*4) + " lw $" + str(int(self.I[6:11],2)) + "," + str(int(self.I[16:32],2) - 8192) + "($" + str(int(self.I[6:11],2)) + ")" + "   Taking 5 cycles"  )
+            elif(self.name == "sll"):
+                print("Cycle: " + str(self.cycle-4) + "|PC: " +str(self.pc*4) + " sll $" + str(int(self.I[16:21],2)) + ",$" +str(int(self.I[6:11],2)) + ",$" + str(int(self.I[11:16],2)) + "   Taking 4 cycles")
+            elif(self.name == "xor"):
+                print("Cycle: " + str(self.cycle-4) + "|PC: " +str(self.pc*4) + " xor $" + str(int(self.I[16:21],2)) + ",$" +str(int(self.I[6:11],2)) + ",$" + str(int(self.I[11:16],2)) + "   Taking 4 cycles")
             else:
-                print("")
+                print("\n")
 
     def exitSim(self):
+        threeCyclePercent = round(((self.threeCycles/self.cycle) * 100),3)
+        fourCyclePercent = round(((self.fourCycles/self.cycle) * 100),3)
+        fiveCyclePercent = round(((self.fiveCycles/self.cycle) * 100),3)
         print("***Finished simulation***")
         print("Total # of cycles: " + str(self.cycle))
-        print("Dynamic instructions count: " +str(self.DIC) + ". Break down:")
-        print("                    " + str(self.threeCycles) + " instructions take 3 cycles" )  
-        print("                    " + str(self.fourCycles) + " instructions take 4 cycles" )
-        print("                    " + str(self.fiveCycles) + " instructions take 5 cycles" )
+        print("Dynamic instructions count: " +str(self.DIC) + ".\n\n    Break down:")
+        print("    " + str(self.threeCycles) + " instructions take 3 cycles" )
+        print("    " + str(threeCyclePercent) + " percent of instruction had 3 cycles\n")  
+        print("    " + str(self.fourCycles) + " instructions take 4 cycles" )
+        print("    " + str(fourCyclePercent) + " percent of instruction had 4 cycles\n") 
+        print("    " + str(self.fiveCycles) + " instructions take 5 cycles" )
+        print("    " + str(fiveCyclePercent) + " percent of instruction had 5 cycles\n") 
 
 
 
@@ -80,7 +102,7 @@ def simulate(Instructions, InstructionsHex, debugMode):
         
         if(fetch[0:32] == '00010000000000001111111111111111'):
             finished = True
-            print("PC = " + str(PC*4) + "  Instruction: 0x" + InstructionsHex[PC] + " : Deadloop. Exiting simulation" )
+            print("PC = " + str(PC*4) + "  Instruction: 0x" + InstructionsHex[PC] + "\n Deadloop. Exiting simulation" )
 
         elif(fetch[0:6] == '000000' and fetch[21:32] == '00000100000'): 
             Register[int(fetch[16:21],2)] = Register[int(fetch[6:11],2)] + Register[int(fetch[11:16],2)]
@@ -118,7 +140,7 @@ def simulate(Instructions, InstructionsHex, debugMode):
             
         elif(fetch[0:6] == '000000' and fetch[21:32] == '00000101011'):
             Register[int(fetch[16:21],2)] = 1 if Register[int(fetch[6:11],2)] < Register[int(fetch[11:16],2)] else 0
-            stats.log(fetch,"slt", 4, PC) # SLTU instr, 4 cycles
+            stats.log(fetch,"sltu", 4, PC) # SLTU instr, 4 cycles
             PC += 1
         
         elif(fetch[0:6] == '000000' and fetch[26:32] == '000000'):
@@ -150,6 +172,16 @@ def simulate(Instructions, InstructionsHex, debugMode):
             imm = int(fetch[16:32],2)
             Memory[imm + Register[int(fetch[6:11],2)] - 8192]= Register[int(fetch[11:16],2)] # Store word into memory
             stats.log(fetch,"sw", 4, PC)    # SW instr, 4 cycles
+            PC += 1
+        elif(fetch[0:6] == '100011'):
+            #Sanity check for word-addressing 
+            if ( int(fetch[30:32])%4 != 0 ):
+                print("Runtime exception: fetch address not aligned on word boundary. Exiting ")
+                print("Instruction causing error:", hex(int(fetch,2)))
+                exit()       
+            imm = int(fetch[16:32],2)
+            Memory[imm + Register[int(fetch[6:11],2)] - 8192]= Register[int(fetch[11:16],2)] # Store word into memory
+            stats.log(fetch,"lw", 5, PC)    # lw instr, 5 cycles
             PC += 1
         else:
             print("Instruction " + str(InstructionsHex[PC]) + " not supported. Exiting")
@@ -191,6 +223,7 @@ def main():
         Instructions.append(line)
 
     simulate(Instructions, InstructionsHex, debugMode)
+    cheappipesimulate(Instructions, InstructionsHex,debugMode)
 
 
 if __name__ == "__main__":
