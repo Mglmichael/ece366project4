@@ -93,12 +93,6 @@ def simulate(Instructions, InstructionsHex, debugMode):
             stats.log(fetch,"addi", 4, PC) # ADDI instr, 4 cycles
             PC += 1
 
-        elif(fetch[0:6] == '001101'):  
-            imm = int(fetch[16:32],2) if fetch[16]=='0' else -(65535 -int(fetch[16:32],2)+1)
-            Register[int(fetch[11:16],2)] = Register[int(fetch[6:11],2)] + imm
-            stats.log(fetch,"ori", 4, PC) # ORI instr, 4 cycles
-            PC += 1
-            
         elif(fetch[0:6] == '000100'):  
             imm = int(fetch[16:32],2) if fetch[16]=='0' else -(65535 -int(fetch[16:32],2)+1)
             stats.log(fetch,"beq", 3, PC) # BEQ instr, 3 cycles
@@ -109,27 +103,6 @@ def simulate(Instructions, InstructionsHex, debugMode):
             Register[int(fetch[16:21],2)] = 1 if Register[int(fetch[6:11],2)] < Register[int(fetch[11:16],2)] else 0
             stats.log(fetch,"slt", 4, PC) # SLT instr, 4 cycles
             PC += 1
-            
-        elif(fetch[0:6] == '000000' and fetch[26:32] == '101011'):
-            Register[int(fetch[16:21],2)] = 1 if Register[int(fetch[6:11],2)] < Register[int(fetch[11:16],2)] else 0
-            stats.log(fetch,"slt", 4, PC) # SLTU instr, 4 cycles
-            PC += 1
-        
-        elif(fetch[0:6] == '100001' and fetch[26:32] == '000000'):
-            Register[int(fetch[16:20],2)] = Register[int(fetch[12:16],2)] << Register[int(fetch[22:26],2)]
-            stats.log(fetch,"sll", 4, PC) # SLL instr, 4 cycles
-            PC += 1
-
-        elif(fetch[0:6] == '100001' and fetch[26:32] == '000000'):
-            Register[int(fetch[16:21],2)] = Register[int(fetch[6:11],2)] + Register[int(fetch[11:16],2)]
-            stats.log(fetch,"addu", 4, PC) # ADDU instr, 4 cycles
-            PC += 1
-
-        elif(fetch[0:6] == '000000' and fetch[26:32] == '100010'):
-            Register[int(fetch[16:21],2)] = Register[int(fetch[6:11],2)] - Register[int(fetch[11:16],2)]
-            stats.log(fetch,"sub", 4, PC) # SUB instr, 4 cycles
-            PC += 1
-            
         elif(fetch[0:6] == '101011'):
             #Sanity check for word-addressing 
             if ( int(fetch[30:32])%4 != 0 ):

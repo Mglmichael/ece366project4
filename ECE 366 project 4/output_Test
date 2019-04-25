@@ -1,0 +1,9 @@
+Cycle 0 for multi-cycle:
+PC =0 Instruction: 0x2062ffff :addi $2,$3, -1
+Takes 4 cycles for multi-cycle
+
+Cycle 4for multi-cycle:
+PC =4 Instruction: 0xac022000 :sw $2, 0x0x2000($0)
+Takes 4 cycles for multi-cycle
+
+Cache miss, loading correct block from deeper memory...

@@ -154,11 +154,11 @@ class Cache:
 
 			zeroString = ""
 
-			if ( self.wordsPerBlock != 1 ): 	#This is easier than trying to think through the issue mentioned below 
+			#if ( self.wordsPerBlock != 1 ): 	#This is easier than trying to think through the issue mentioned below 
 
-				for i in range( ceil( log( self.wordsPerBlock, 2 ) ), i ):	#There might be a bug here with this loop if wordsPerBlock is 1 or 0; 0 should be a rejected number though
+			#	for i in range( ceil( log( self.wordsPerBlock, 2 ) ) ):	#There might be a bug here with this loop if wordsPerBlock is 1 or 0; 0 should be a rejected number though
 
-					zeroString = zeroString + "0"  	#Does it execute at all if wordsPerBlock is 1? Hopefully it doesn't...
+			#		zeroString = zeroString + "0"  	#Does it execute at all if wordsPerBlock is 1? Hopefully it doesn't...
 
 			memIndex = ( int( ( tag + format( setIndex, "03b" ) + zeroString + "00" ), 2 ) // 4 ) - 2048
 
@@ -644,11 +644,11 @@ def simulate( instructions, instructionsHex, debugMode, program):
 
 	outFile.write("Total # of cycles for multi-cycle: " + str(Cycle) + "\n")
 
-	outFile.write("                    " + str(threeCycles) + " instructions take 3 cycles\n" )
+	outFile.write("                    " + str(threeCycles) + " instructions take 3 cycles\n" + "           " + str(threeCyclePercent) + " Percent of 3 cycles in the program\n")
 
-	outFile.write("                    " + str(fourCycles) + " instructions take 4 cycles\n" )
+	outFile.write("                    " + str(fourCycles) + " instructions take 4 cycles\n" + "           " + str(fourCyclePercent) + " Percent of 4 cycles in the program\n")
 
-	outFile.write("                    " + str(fiveCycles) + " instructions take 5 cycles\n\n" )
+	outFile.write("                    " + str(fiveCycles) + " instructions take 5 cycles\n\n" + "           " + str(fiveCyclePercent) + " Percent of 5 cycles in the program\n\n" )
 
 	outFile.write( "Total cycles for pipelined CPU: "+ str( pipelineCycles ) + "\n\n" )
 
